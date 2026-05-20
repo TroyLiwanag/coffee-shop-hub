@@ -11,7 +11,7 @@ function LoginScreen() {
   const { user, login } = usePos();
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [pin, setPin] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
 
   useEffect(() => {
@@ -21,8 +21,8 @@ function LoginScreen() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!login(name.trim(), pin.trim())) {
-      setErr("Invalid username or PIN. Try Sara / 1234 or Admin / 0000.");
+    if (!login(name.trim(), password.trim())) {
+      setErr("Invalid username or password. Try staff / staff123, admin / admin123, or superadmin / superadmin123.");
     }
   };
 
@@ -41,12 +41,12 @@ function LoginScreen() {
         <form onSubmit={submit} className="bg-card rounded-2xl shadow-xl p-8 space-y-5 border">
           <div>
             <label className="text-sm font-medium text-foreground">Username</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Sara"
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="staff"
                    className="mt-2 w-full px-4 py-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
           <div>
-            <label className="text-sm font-medium text-foreground">PIN</label>
-            <input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} placeholder="••••"
+            <label className="text-sm font-medium text-foreground">Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
                    className="mt-2 w-full px-4 py-3 rounded-lg border border-input bg-background tracking-widest focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
           {err && (
@@ -59,7 +59,7 @@ function LoginScreen() {
             Log in
           </button>
           <div className="text-xs text-center text-muted-foreground pt-2 border-t">
-            Demo · <span className="font-medium">Sara / 1234</span> (cashier) · <span className="font-medium">Admin / 0000</span>
+            Demo · <span className="font-medium">staff / staff123</span> (cashier) · <span className="font-medium">admin / admin123</span> (admin) · <span className="font-medium">superadmin / superadmin123</span> (admin)
           </div>
         </form>
       </div>

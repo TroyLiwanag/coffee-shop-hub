@@ -10,14 +10,14 @@ export const Route = createFileRoute("/_app/employees")({
 function EmployeesScreen() {
   const { employees, addEmployee, removeEmployee, user } = usePos();
   const [name, setName] = useState("");
-  const [pin, setPin] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<"cashier" | "admin">("cashier");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !pin.trim()) return;
-    addEmployee({ name: name.trim(), pin: pin.trim(), role });
-    setName(""); setPin(""); setRole("cashier");
+    if (!name.trim() || !password.trim()) return;
+    addEmployee({ name: name.trim(), password: password.trim(), role });
+    setName(""); setPassword(""); setRole("cashier");
   };
 
   return (
@@ -31,7 +31,7 @@ function EmployeesScreen() {
               <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">PIN</th>
+                <th className="px-6 py-3">Password</th>
                 <th className="px-6 py-3 text-right">Action</th>
               </tr>
             </thead>
@@ -76,8 +76,8 @@ function EmployeesScreen() {
                    className="mt-1.5 w-full px-3 py-2 rounded-lg border bg-background" />
           </div>
           <div>
-            <label className="text-sm font-medium">PIN</label>
-            <input value={pin} onChange={e => setPin(e.target.value)} type="password"
+            <label className="text-sm font-medium">Password</label>
+            <input value={password} onChange={e => setPassword(e.target.value)} type="password"
                    className="mt-1.5 w-full px-3 py-2 rounded-lg border bg-background tracking-widest" />
           </div>
           <div>

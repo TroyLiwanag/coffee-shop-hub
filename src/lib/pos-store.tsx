@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type Role = "cashier" | "admin";
-export interface User { id: string; name: string; pin: string; role: Role; }
+export interface User { id: string; name: string; password: string; role: Role; }
 export interface Product { id: string; name: string; price: number; category: "Coffee" | "Tea" | "Snacks"; emoji: string; }
 export interface CartItem { id: string; product: Product; qty: number; size: string; sugar: string; milk: string; addons: string[]; notes: string; unitPrice: number; }
 export interface Ingredient { id: string; name: string; stock: number; min: number; unit: string; }
@@ -25,8 +25,9 @@ export const PRODUCTS: Product[] = [
 ];
 
 export const USERS: User[] = [
-  { id: "u1", name: "Sara (Cashier)", pin: "1234", role: "cashier" },
-  { id: "u2", name: "Admin", pin: "0000", role: "admin" },
+  { id: "u1", name: "staff", password: "staff123", role: "cashier" },
+  { id: "u2", name: "admin", password: "admin123", role: "admin" },
+  { id: "u3", name: "superadmin", password: "superadmin123", role: "admin" },
 ];
 
 const INITIAL_INGREDIENTS: Ingredient[] = [
@@ -65,7 +66,7 @@ const DEFAULT_SETTINGS: Settings = {
 
 interface Ctx {
   user: User | null;
-  login: (name: string, pin: string) => boolean;
+  login: (name: string, password: string) => boolean;
   logout: () => void;
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
@@ -121,8 +122,8 @@ export function PosProvider({ children }: { children: ReactNode }) {
   useEffect(() => { if (hydrated) localStorage.setItem("pos.settings", JSON.stringify(settings)); }, [settings, hydrated]);
   useEffect(() => { if (hydrated) localStorage.setItem("pos.employees", JSON.stringify(employees)); }, [employees, hydrated]);
 
-  const login = (name: string, pin: string) => {
-    const u = employees.find(e => e.name.toLowerCase().startsWith(name.toLowerCase()) && e.pin === pin);
+  const login = (name: string, password: string) => {
+    const u = employees.find(e => e.name.toLowerCase() === name.toLowerCase() && e.password === password);
     if (u) { setUser(u); return true; }
     return false;
   };
