@@ -14,14 +14,14 @@ export function AppShell() {
 
   if (!user) return null;
 
-  const navAll = [
+  const navAll: { to: string; label: string; icon: typeof Home; roles: Array<"cashier" | "admin"> }[] = [
     { to: "/pos", label: "POS", icon: Home, roles: ["cashier", "admin"] },
     { to: "/orders", label: "Orders", icon: Receipt, roles: ["cashier", "admin"] },
     { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin"] },
     { to: "/reports", label: "Reports", icon: BarChart3, roles: ["admin"] },
     { to: "/employees", label: "Employees", icon: Users, roles: ["admin"] },
     { to: "/settings", label: "Settings", icon: Settings, roles: ["admin"] },
-  ] as const;
+  ];
   const nav = navAll.filter(n => n.roles.includes(user.role));
 
   return (
