@@ -254,5 +254,5 @@ export function usePos() {
 }
 
 export function fmt(n: number) {
-  return `$${n.toFixed(2)}`;
+  return `₱${n.toFixed(2)}`;
 }
