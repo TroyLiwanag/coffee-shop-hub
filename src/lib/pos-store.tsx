@@ -2,26 +2,99 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 export type Role = "cashier" | "admin";
 export interface User { id: string; name: string; password: string; role: Role; }
-export interface Product { id: string; name: string; price: number; category: "Coffee" | "Tea" | "Snacks"; emoji: string; }
+export type Category = "Coffee" | "Non-Coffee" | "Iced Blended" | "Snacks" | "Rice Meals";
+export interface Product { id: string; name: string; price: number; category: Category; emoji: string; }
 export interface CartItem { id: string; product: Product; qty: number; size: string; sugar: string; milk: string; addons: string[]; notes: string; unitPrice: number; }
 export interface Ingredient { id: string; name: string; stock: number; min: number; unit: string; }
 export interface Order { id: string; number: number; items: CartItem[]; total: number; method: "Cash" | "QR"; cashier: string; createdAt: string; }
 
 export const PRODUCTS: Product[] = [
-  { id: "p1", name: "Espresso", price: 2.5, category: "Coffee", emoji: "☕" },
-  { id: "p2", name: "Cappuccino", price: 3.8, category: "Coffee", emoji: "☕" },
-  { id: "p3", name: "Latte", price: 4.2, category: "Coffee", emoji: "🥛" },
-  { id: "p4", name: "Mocha", price: 4.5, category: "Coffee", emoji: "🍫" },
-  { id: "p5", name: "Americano", price: 3.0, category: "Coffee", emoji: "☕" },
-  { id: "p6", name: "Flat White", price: 4.0, category: "Coffee", emoji: "☕" },
-  { id: "p7", name: "Green Tea", price: 3.2, category: "Tea", emoji: "🍵" },
-  { id: "p8", name: "Earl Grey", price: 3.2, category: "Tea", emoji: "🫖" },
-  { id: "p9", name: "Chai Latte", price: 3.8, category: "Tea", emoji: "🫖" },
-  { id: "p10", name: "Matcha", price: 4.5, category: "Tea", emoji: "🍵" },
-  { id: "p11", name: "Croissant", price: 2.8, category: "Snacks", emoji: "🥐" },
-  { id: "p12", name: "Muffin", price: 2.5, category: "Snacks", emoji: "🧁" },
-  { id: "p13", name: "Cheesecake", price: 4.0, category: "Snacks", emoji: "🍰" },
-  { id: "p14", name: "Cookie", price: 1.8, category: "Snacks", emoji: "🍪" },
+  // Coffee — Hot
+  { id: "c1", name: "V60 Single Origin (Hot)", price: 49, category: "Coffee", emoji: "☕" },
+  { id: "c2", name: "Americano (Hot)", price: 65, category: "Coffee", emoji: "☕" },
+  { id: "c3", name: "Flavored Americano (Hot)", price: 85, category: "Coffee", emoji: "☕" },
+  { id: "c4", name: "Cappuccino (Hot)", price: 85, category: "Coffee", emoji: "☕" },
+  { id: "c5", name: "Cafe Latte (Hot)", price: 85, category: "Coffee", emoji: "🥛" },
+  { id: "c6", name: "Cafe Mocha (Hot)", price: 95, category: "Coffee", emoji: "🍫" },
+  { id: "c7", name: "Caramel Macchiato (Hot)", price: 95, category: "Coffee", emoji: "☕" },
+  { id: "c8", name: "Spanish Latte (Hot)", price: 105, category: "Coffee", emoji: "🥛" },
+  { id: "c9", name: "White Choco Mocha (Hot)", price: 95, category: "Coffee", emoji: "🤍" },
+  { id: "c10", name: "Hazelnut (Hot)", price: 95, category: "Coffee", emoji: "🌰" },
+  { id: "c11", name: "French Vanilla (Hot)", price: 95, category: "Coffee", emoji: "🍦" },
+  // Coffee — Over Iced (Medium base)
+  { id: "c12", name: "V60 Single Origin (Iced)", price: 49, category: "Coffee", emoji: "🧊" },
+  { id: "c13", name: "Americano (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c14", name: "Flavored Americano (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c15", name: "Cappuccino (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c16", name: "Cafe Latte (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c17", name: "Cafe Mocha (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c18", name: "Caramel Macchiato (Iced)", price: 65, category: "Coffee", emoji: "🧊" },
+  { id: "c19", name: "Spanish Latte (Iced)", price: 75, category: "Coffee", emoji: "🧊" },
+  { id: "c20", name: "White Choco Mocha (Iced)", price: 95, category: "Coffee", emoji: "🧊" },
+  { id: "c21", name: "Biscoff Latte (Iced)", price: 75, category: "Coffee", emoji: "🍪" },
+  { id: "c22", name: "Hazelnut (Iced)", price: 75, category: "Coffee", emoji: "🌰" },
+  { id: "c23", name: "French Vanilla (Iced)", price: 75, category: "Coffee", emoji: "🍦" },
+
+  // Non-Coffee — Over Iced
+  { id: "n1", name: "Iced Choco", price: 65, category: "Non-Coffee", emoji: "🍫" },
+  { id: "n2", name: "Oreo Milk", price: 65, category: "Non-Coffee", emoji: "🥛" },
+  { id: "n3", name: "White Choco", price: 65, category: "Non-Coffee", emoji: "🤍" },
+  { id: "n4", name: "Chocoberry", price: 75, category: "Non-Coffee", emoji: "🍓" },
+  { id: "n5", name: "Strawberry Latte", price: 65, category: "Non-Coffee", emoji: "🍓" },
+  { id: "n6", name: "Blueberry Latte", price: 65, category: "Non-Coffee", emoji: "🫐" },
+  // Fruitea (H2O base price)
+  { id: "n7", name: "Lemon Fruitea", price: 30, category: "Non-Coffee", emoji: "🍋" },
+  { id: "n8", name: "Kiwi Fruitea", price: 30, category: "Non-Coffee", emoji: "🥝" },
+  { id: "n9", name: "Blueberry Fruitea", price: 30, category: "Non-Coffee", emoji: "🫐" },
+  { id: "n10", name: "Mango Fruitea", price: 30, category: "Non-Coffee", emoji: "🥭" },
+  { id: "n11", name: "Strawberry Fruitea", price: 30, category: "Non-Coffee", emoji: "🍓" },
+  // Matcha Series
+  { id: "n12", name: "Japanese Matcha", price: 65, category: "Non-Coffee", emoji: "🍵" },
+  { id: "n13", name: "Uji Matcha", price: 65, category: "Non-Coffee", emoji: "🍵" },
+  { id: "n14", name: "Strawberry Matcha", price: 75, category: "Non-Coffee", emoji: "🍵" },
+  { id: "n15", name: "Blueberry Matcha", price: 75, category: "Non-Coffee", emoji: "🍵" },
+  { id: "n16", name: "Choco Matcha", price: 75, category: "Non-Coffee", emoji: "🍵" },
+  { id: "n17", name: "Dirty Matcha", price: 75, category: "Non-Coffee", emoji: "🍵" },
+
+  // Iced Blended — Coffee
+  { id: "b1", name: "Cappuccino Frappe", price: 120, category: "Iced Blended", emoji: "🥤" },
+  { id: "b2", name: "Mochachino", price: 120, category: "Iced Blended", emoji: "🥤" },
+  { id: "b3", name: "Biscoffee", price: 150, category: "Iced Blended", emoji: "🍪" },
+  { id: "b4", name: "Coffee Nutella", price: 150, category: "Iced Blended", emoji: "🍫" },
+  { id: "b5", name: "Pistachio Coffee", price: 220, category: "Iced Blended", emoji: "🥜" },
+  { id: "b6", name: "Dirty Matcha Frappe", price: 130, category: "Iced Blended", emoji: "🍵" },
+  { id: "b7", name: "Caramel Frappe", price: 120, category: "Iced Blended", emoji: "🥤" },
+  // Iced Blended — Non-Coffee
+  { id: "b8", name: "Vanilla Frappe", price: 100, category: "Iced Blended", emoji: "🍦" },
+  { id: "b9", name: "Chocolate Frappe", price: 100, category: "Iced Blended", emoji: "🍫" },
+  { id: "b10", name: "Salted Caramel", price: 100, category: "Iced Blended", emoji: "🧂" },
+  { id: "b11", name: "Biscoff Biscuit", price: 150, category: "Iced Blended", emoji: "🍪" },
+  { id: "b12", name: "Nutty Nutella", price: 150, category: "Iced Blended", emoji: "🍫" },
+  { id: "b13", name: "Pistachio Crunch", price: 220, category: "Iced Blended", emoji: "🥜" },
+  { id: "b14", name: "Oreo Matcha", price: 150, category: "Iced Blended", emoji: "🍵" },
+  { id: "b15", name: "Oreo Frappe", price: 120, category: "Iced Blended", emoji: "🥤" },
+  { id: "b16", name: "Matcha Frappe", price: 120, category: "Iced Blended", emoji: "🍵" },
+  { id: "b17", name: "Strawberry Frappe", price: 120, category: "Iced Blended", emoji: "🍓" },
+  { id: "b18", name: "Blueberry Frappe", price: 120, category: "Iced Blended", emoji: "🫐" },
+  { id: "b19", name: "Fresh Lemonade", price: 85, category: "Iced Blended", emoji: "🍋" },
+
+  // Snacks
+  { id: "s1", name: "Fries (Plain/Cheese/Sour Cream/BBQ)", price: 90, category: "Snacks", emoji: "🍟" },
+  { id: "s2", name: "Nachos Overload", price: 100, category: "Snacks", emoji: "🌽" },
+  { id: "s3", name: "Siomai 4pcs", price: 39, category: "Snacks", emoji: "🥟" },
+  { id: "s4", name: "Waffle — Plain", price: 60, category: "Snacks", emoji: "🧇" },
+  { id: "s5", name: "Waffle — Caramel", price: 85, category: "Snacks", emoji: "🧇" },
+  { id: "s6", name: "Waffle — Oreo Cream", price: 95, category: "Snacks", emoji: "🧇" },
+  { id: "s7", name: "Waffle — Nutty Nutella", price: 105, category: "Snacks", emoji: "🧇" },
+  { id: "s8", name: "Waffle — Biscoff", price: 95, category: "Snacks", emoji: "🧇" },
+  { id: "s9", name: "Waffle — Pork Floss", price: 120, category: "Snacks", emoji: "🧇" },
+
+  // Rice Meals
+  { id: "r1", name: "Shang-si (Shanghai, Sinangag)", price: 55, category: "Rice Meals", emoji: "🍚" },
+  { id: "r2", name: "Shang-silog (Shanghai, Rice, Egg)", price: 70, category: "Rice Meals", emoji: "🍳" },
+  { id: "r3", name: "Sio-silog (Siomai 4pcs, Rice, Egg)", price: 70, category: "Rice Meals", emoji: "🥟" },
+  { id: "r4", name: "Spam-silog (Spam, Rice, Egg)", price: 85, category: "Rice Meals", emoji: "🥓" },
+  { id: "r5", name: "Nuggets-silog (Nuggets 5pcs, Rice, Egg)", price: 120, category: "Rice Meals", emoji: "🍗" },
 ];
 
 export const USERS: User[] = [
