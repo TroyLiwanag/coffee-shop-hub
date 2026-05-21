@@ -31,10 +31,10 @@ function LoginScreen() {
          style={{ background: "linear-gradient(135deg, var(--cream), var(--background))" }}>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-lg">
-            <Coffee className="w-10 h-10 text-primary-foreground" />
+          <div className="w-28 h-28 rounded-full bg-card flex items-center justify-center shadow-lg overflow-hidden border-4 border-card">
+            <img src={logo} alt="Cafe Corazon logo" className="w-full h-full object-contain p-1" />
           </div>
-          <h1 className="font-display text-3xl mt-4 text-foreground">Caramel & Co.</h1>
+          <h1 className="font-display text-3xl mt-4 text-foreground">Cafe Corazon</h1>
           <p className="text-sm text-muted-foreground mt-1">Sign in to your station</p>
         </div>
 
