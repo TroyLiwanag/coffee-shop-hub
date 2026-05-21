@@ -127,9 +127,10 @@ interface Settings {
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  shopName: "Caramel & Co.",
-  address: "12 Roasters Lane, Bean City",
-  phone: "+1 (555) 010-2233",
+const DEFAULT_SETTINGS: Settings = {
+  shopName: "Cafe Corazon",
+  address: "FB: CorazonsTea",
+  phone: "0916 583 6120",
   taxEnabled: true,
   taxRate: 8,
   serviceEnabled: false,
