@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { usePos } from "@/lib/pos-store";
-import { Coffee } from "lucide-react";
+import logo from "@/assets/cafe-corazon-logo.png";
 
 export const Route = createFileRoute("/")({
   component: LoginScreen,
