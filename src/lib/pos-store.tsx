@@ -127,7 +127,6 @@ interface Settings {
 }
 
 const DEFAULT_SETTINGS: Settings = {
-const DEFAULT_SETTINGS: Settings = {
   shopName: "Cafe Corazon",
   address: "FB: CorazonsTea",
   phone: "0916 583 6120",
