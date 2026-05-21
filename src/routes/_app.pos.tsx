@@ -7,15 +7,15 @@ export const Route = createFileRoute("/_app/pos")({
   component: PosScreen,
 });
 
-const CATEGORIES = ["Coffee", "Tea", "Snacks"] as const;
-const SIZES = [{ name: "Small", add: 0 }, { name: "Medium", add: 0.5 }, { name: "Large", add: 1 }];
+const CATEGORIES = ["Coffee", "Non-Coffee", "Iced Blended", "Snacks", "Rice Meals"] as const;
+const SIZES = [{ name: "Medium", add: 0 }, { name: "Large", add: 20 }];
 const SUGAR = ["No sugar", "Less", "Normal", "Extra"];
-const MILK = ["Whole", "Oat (+$0.50)", "Almond (+$0.50)", "None"];
+const MILK = ["Whole", "Oat (+₱10)", "Almond (+₱10)", "None"];
 const ADDONS = [
-  { name: "Extra shot", price: 0.8 },
-  { name: "Whipped cream", price: 0.5 },
-  { name: "Vanilla syrup", price: 0.5 },
-  { name: "Caramel drizzle", price: 0.5 },
+  { name: "Extra shot", price: 20 },
+  { name: "Whipped cream", price: 15 },
+  { name: "Vanilla syrup", price: 10 },
+  { name: "Caramel drizzle", price: 10 },
 ];
 
 function PosScreen() {
