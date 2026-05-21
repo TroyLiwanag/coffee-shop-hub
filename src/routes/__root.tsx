@@ -36,8 +36,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Caramel & Co. — Coffee POS" },
-      { name: "description", content: "Coffee shop point-of-sale system" },
+      { title: "Cafe Corazon — Coffee POS" },
+      { name: "description", content: "Cafe Corazon coffee shop point-of-sale system" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
