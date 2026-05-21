@@ -158,7 +158,7 @@ function CustomizeModal({ product, onClose, onAdd }: { product: Product; onClose
   const [notes, setNotes] = useState("");
 
   const sizeAdd = SIZES.find(s => s.name === size)?.add ?? 0;
-  const milkAdd = milk.includes("+$0.50") ? 0.5 : 0;
+  const milkAdd = milk.includes("+₱10") ? 10 : 0;
   const addonsTotal = ADDONS.filter(a => addons.includes(a.name)).reduce((s, a) => s + a.price, 0);
   const unitPrice = product.price + sizeAdd + milkAdd + addonsTotal;
 
