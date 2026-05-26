@@ -19,7 +19,7 @@ const ADDONS = [
 ];
 
 function PosScreen() {
-  const { user, cart, addToCart, removeFromCart, updateQty, cartSubtotal, cartTax, cartService, cartTotal, settings } = usePos();
+  const { user, cart, addToCart, removeFromCart, updateQty, cartSubtotal, vatAmount, serviceCharge, cartTotal, settings } = usePos();
   const navigate = useNavigate();
   const [category, setCategory] = useState<typeof CATEGORIES[number]>("Coffee");
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
@@ -120,8 +120,8 @@ function PosScreen() {
 
         <div className="border-t p-5 space-y-2 bg-background">
           <Row label="Subtotal" value={fmt(cartSubtotal)} />
-          {settings.taxEnabled && <Row label={`Tax (${settings.taxRate}%)`} value={fmt(cartTax)} />}
-          {settings.serviceEnabled && <Row label={`Service (${settings.serviceRate}%)`} value={fmt(cartService)} />}
+          {settings.vatEnabled && <Row label={`VAT (${settings.vatRate}%) incl.`} value={fmt(vatAmount)} />}
+          {settings.serviceEnabled && <Row label={`Service (${settings.serviceRate}%)`} value={fmt(serviceCharge)} />}
           <div className="flex justify-between pt-2 border-t">
             <span className="font-display text-lg">Total</span>
             <span className="font-display text-xl text-primary">{fmt(cartTotal)}</span>

@@ -16,19 +16,24 @@ function SettingsScreen() {
 
       <Section title="Shop information">
         <Field label="Shop name" value={settings.shopName} onChange={v => updateSettings({ shopName: v })} />
+        <Field label="Business style" value={settings.businessStyle} onChange={v => updateSettings({ businessStyle: v })} />
         <Field label="Address" value={settings.address} onChange={v => updateSettings({ address: v })} />
         <Field label="Phone" value={settings.phone} onChange={v => updateSettings({ phone: v })} />
+        <Field label="VAT TIN" value={settings.tin} onChange={v => updateSettings({ tin: v })} />
       </Section>
 
-      <Section title="Tax & service">
-        <Toggle label="Apply tax" checked={settings.taxEnabled} onChange={v => updateSettings({ taxEnabled: v })} />
-        {settings.taxEnabled && (
-          <Field label="Tax rate (%)" type="number" value={String(settings.taxRate)} onChange={v => updateSettings({ taxRate: Number(v) || 0 })} />
+      <Section title="VAT & service">
+        <Toggle label="Apply VAT (12%) — VAT-inclusive pricing" checked={settings.vatEnabled} onChange={v => updateSettings({ vatEnabled: v })} />
+        {settings.vatEnabled && (
+          <Field label="VAT rate (%)" type="number" value={String(settings.vatRate)} onChange={v => updateSettings({ vatRate: Number(v) || 0 })} />
         )}
         <Toggle label="Apply service fee" checked={settings.serviceEnabled} onChange={v => updateSettings({ serviceEnabled: v })} />
         {settings.serviceEnabled && (
           <Field label="Service rate (%)" type="number" value={String(settings.serviceRate)} onChange={v => updateSettings({ serviceRate: Number(v) || 0 })} />
         )}
+        <p className="text-xs text-muted-foreground">
+          Senior Citizens (RA 9994) and PWDs (RA 10754) receive a 20% discount and are exempt from VAT.
+        </p>
       </Section>
 
       <Section title="Receipt">
@@ -39,10 +44,13 @@ function SettingsScreen() {
         <div className="text-sm text-muted-foreground">
           <p className="mb-2">Logged in as <span className="font-medium text-foreground">{user?.name}</span> ({user?.role}).</p>
           <ul className="list-disc ml-5 space-y-1">
-            <li><b>Cashier:</b> POS, current orders</li>
-            <li><b>Admin:</b> Full access including Inventory, Reports, Employees, Settings</li>
+            <li><b>Staff:</b> Attendance (clock in/out)</li>
+            <li><b>Cashier:</b> POS, orders, attendance</li>
+            <li><b>Admin:</b> Full access — inventory, reports, payroll, employees, audit, settings</li>
           </ul>
-          <p className="mt-2 text-xs">Manage staff in the Employees page.</p>
+          <p className="mt-2 text-xs">
+            Only employees marked "Authorized" in Employees can export or print reports.
+          </p>
         </div>
       </Section>
 

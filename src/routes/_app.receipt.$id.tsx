@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_app/receipt/$id")({
 
 function ReceiptScreen() {
   const { id } = Route.useParams();
-  const { orders, settings } = usePos();
+  const { orders, settings, user } = usePos();
   const navigate = useNavigate();
   const order = orders.find(o => o.id === id);
   const [emailSent, setEmailSent] = useState(false);
@@ -23,7 +23,9 @@ function ReceiptScreen() {
     );
   }
 
-  const subtotal = order.items.reduce((s, i) => s + i.unitPrice * i.qty, 0);
+  const canPrint = user?.canExport || user?.role === "admin";
+  const orNo = String(order.number).padStart(7, "0");
+  const isExempt = order.discount.type === "Senior" || order.discount.type === "PWD";
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
@@ -33,55 +35,108 @@ function ReceiptScreen() {
         </div>
         <div>
           <h1 className="font-display text-3xl">Payment successful</h1>
-          <p className="text-muted-foreground text-sm">Order #{order.number}</p>
+          <p className="text-muted-foreground text-sm">Official Receipt #{orNo}</p>
         </div>
       </div>
 
-      <div className="bg-card rounded-2xl border p-8 shadow-sm">
+      <div className="bg-card rounded-2xl border p-8 shadow-sm" id="printable-receipt">
         <div className="text-center pb-5 border-b border-dashed">
           <h2 className="font-display text-2xl">{settings.shopName}</h2>
-          <p className="text-xs text-muted-foreground mt-1">{settings.address}</p>
-          <p className="text-xs text-muted-foreground">{settings.phone}</p>
+          <p className="text-xs text-muted-foreground mt-1">{settings.businessStyle}</p>
+          <p className="text-xs text-muted-foreground">{settings.address}</p>
+          <p className="text-xs text-muted-foreground">Tel: {settings.phone}</p>
+          <p className="text-xs text-muted-foreground">VAT REG TIN: {settings.tin}</p>
+          <p className="font-display text-base mt-3 tracking-wider">OFFICIAL RECEIPT</p>
         </div>
 
-        <div className="flex justify-between text-xs text-muted-foreground py-3">
-          <span>Order #{order.number}</span>
-          <span>{new Date(order.createdAt).toLocaleString()}</span>
+        {/* Customer details form-style */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs py-3 border-b border-dashed">
+          <FormLine label="OR No." value={orNo} />
+          <FormLine label="Date" value={new Date(order.createdAt).toLocaleString()} />
+          <FormLine label="Sold to" value={order.customerName || "Walk-in Customer"} />
+          <FormLine label="Cashier" value={order.cashier} />
+          <FormLine label="Address" value={order.customerAddress || "—"} />
+          <FormLine label="TIN" value={order.customerTin || "—"} />
+          <FormLine label="Payment" value={order.method} />
+          {isExempt && (
+            <FormLine label={`${order.discount.type} ID`} value={order.discount.idNumber || "—"} />
+          )}
+          {isExempt && order.discount.beneficiary && (
+            <FormLine label="Beneficiary" value={order.discount.beneficiary} />
+          )}
         </div>
-        <div className="text-xs text-muted-foreground pb-3 border-b border-dashed">Cashier: {order.cashier} · {order.method}</div>
 
-        <div className="py-4 space-y-2">
-          {order.items.map(i => (
-            <div key={i.id} className="flex justify-between text-sm">
-              <div>
-                <div>{i.qty}× {i.product.name}</div>
-                <div className="text-xs text-muted-foreground">{i.size}, {i.sugar}, {i.milk}{i.addons.length ? ` + ${i.addons.join(", ")}` : ""}</div>
-              </div>
-              <div>{fmt(i.unitPrice * i.qty)}</div>
-            </div>
-          ))}
-        </div>
+        <table className="w-full text-sm py-4">
+          <thead>
+            <tr className="text-xs uppercase text-muted-foreground border-b">
+              <th className="text-left py-2">Qty</th>
+              <th className="text-left py-2">Description</th>
+              <th className="text-left py-2">Batch</th>
+              <th className="text-right py-2">Price</th>
+              <th className="text-right py-2">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {order.items.map(i => (
+              <tr key={i.id} className="border-b border-dashed align-top">
+                <td className="py-2">{i.qty}</td>
+                <td className="py-2">
+                  <div>{i.product.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {i.size} · {i.sugar} · {i.milk}{i.addons.length ? ` + ${i.addons.join(", ")}` : ""}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">Unit: {i.product.unit}</div>
+                </td>
+                <td className="py-2 text-xs font-mono">{i.product.batchNo}</td>
+                <td className="py-2 text-right">{fmt(i.unitPrice)}</td>
+                <td className="py-2 text-right">{fmt(i.unitPrice * i.qty)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         <div className="border-t border-dashed pt-3 space-y-1 text-sm">
-          <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{fmt(subtotal)}</span></div>
-          {settings.taxEnabled && (
-            <div className="flex justify-between"><span className="text-muted-foreground">Tax {settings.taxRate}%</span><span>{fmt(subtotal * settings.taxRate / 100)}</span></div>
+          <Row label="Gross Sales" value={fmt(order.subtotal)} />
+          {isExempt ? (
+            <>
+              <Row label={`Less: ${order.discount.type} Discount (20%)`} value={`-${fmt(order.discountAmount)}`} />
+              <Row label="VAT Exempt Sales" value={fmt(order.vatExemptSales)} />
+              <Row label="VAT Amount" value={fmt(0)} muted />
+            </>
+          ) : (
+            settings.vatEnabled && (
+              <>
+                <Row label="VATable Sales" value={fmt(order.vatableSales)} muted />
+                <Row label={`VAT (${settings.vatRate}%)`} value={fmt(order.vatAmount)} muted />
+              </>
+            )
           )}
-          {settings.serviceEnabled && (
-            <div className="flex justify-between"><span className="text-muted-foreground">Service {settings.serviceRate}%</span><span>{fmt(subtotal * settings.serviceRate / 100)}</span></div>
+          {settings.serviceEnabled && order.serviceCharge > 0 && (
+            <Row label={`Service Charge (${settings.serviceRate}%)`} value={fmt(order.serviceCharge)} />
           )}
           <div className="flex justify-between pt-2 mt-2 border-t font-display text-xl">
-            <span>Total</span><span>{fmt(order.total)}</span>
+            <span>TOTAL DUE</span><span>{fmt(order.total)}</span>
           </div>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6 pt-5 border-t border-dashed">
+        <div className="mt-5 pt-4 border-t border-dashed text-[10px] text-muted-foreground leading-relaxed">
+          <p className="font-semibold uppercase mb-1">Legal Basis</p>
+          <p>• VAT pursuant to Sec. 106 & 108 of NIRC of 1997, as amended by RA 10963 (TRAIN Law).</p>
+          <p>• Senior Citizen 20% discount & VAT exemption: RA 9994 (Expanded Senior Citizens Act).</p>
+          <p>• Person With Disability 20% discount & VAT exemption: RA 10754 (Magna Carta for PWDs).</p>
+          <p className="mt-1">This Official Receipt shall be valid for five (5) years from the date of ATP.</p>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-5 pt-4 border-t border-dashed">
           {settings.receiptFooter}
         </p>
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-3">
-        <button onClick={() => window.print()} className="py-3 rounded-lg bg-card border hover:bg-muted flex items-center justify-center gap-2 text-sm">
+        <button onClick={() => canPrint ? window.print() : alert("Only authorized personnel can print receipts.")}
+                className={`py-3 rounded-lg border flex items-center justify-center gap-2 text-sm ${
+                  canPrint ? "bg-card hover:bg-muted" : "bg-muted/40 opacity-60 cursor-not-allowed"
+                }`}>
           <Printer className="w-4 h-4" /> Print receipt
         </button>
         <div className="col-span-1 relative">
@@ -99,6 +154,23 @@ function ReceiptScreen() {
               className="w-full mt-3 py-4 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90">
         New order
       </button>
+    </div>
+  );
+}
+
+function FormLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-2">
+      <span className="text-muted-foreground min-w-[80px]">{label}:</span>
+      <span className="font-medium border-b border-dotted flex-1">{value}</span>
+    </div>
+  );
+}
+
+function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
+  return (
+    <div className={`flex justify-between ${muted ? "text-muted-foreground" : ""}`}>
+      <span>{label}</span><span>{value}</span>
     </div>
   );
 }

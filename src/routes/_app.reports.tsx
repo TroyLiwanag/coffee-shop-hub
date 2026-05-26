@@ -1,31 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { usePos, fmt } from "@/lib/pos-store";
-import { Download, TrendingUp, ShoppingBag, DollarSign } from "lucide-react";
+import { Download, TrendingUp, ShoppingBag, DollarSign, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_app/reports")({
   component: ReportsScreen,
 });
 
-type Range = "Daily" | "Weekly" | "Monthly";
+type Range = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All-Time";
 
 function ReportsScreen() {
-  const { orders } = usePos();
+  const { orders, user } = usePos();
   const [range, setRange] = useState<Range>("Daily");
+  const canExport = user?.canExport || user?.role === "admin";
 
-  const { total, count, avg, buckets, top } = useMemo(() => {
+  const { total, count, avg, buckets, top, vatTotal, discountTotal } = useMemo(() => {
     const now = Date.now();
-    const days = range === "Daily" ? 1 : range === "Weekly" ? 7 : 30;
+    const daysMap: Record<Range, number> = {
+      Daily: 1, Weekly: 7, Monthly: 30, Quarterly: 90, Yearly: 365, "All-Time": 36500,
+    };
+    const days = daysMap[range];
     const cutoff = now - days * 86400000;
     const filtered = orders.filter(o => new Date(o.createdAt).getTime() >= cutoff);
 
-    // synthetic data if empty so chart isn't blank
     const synth = filtered.length === 0;
-    const points = days <= 1 ? 12 : days <= 7 ? 7 : 30;
+    const points = days <= 1 ? 12 : days <= 7 ? 7 : days <= 31 ? 30 : days <= 90 ? 12 : 12;
     const buckets = Array.from({ length: points }, (_, i) => {
       if (synth) {
         const base = 40 + Math.sin(i / 2) * 25 + Math.random() * 30;
-        return { label: range === "Daily" ? `${i * 2}:00` : `Day ${i + 1}`, value: Math.max(10, base) };
+        return { label: range === "Daily" ? `${i * 2}:00` : `P${i + 1}`, value: Math.max(10, base) };
       }
       const slot = (days * 86400000) / points;
       const start = cutoff + i * slot;
@@ -33,12 +36,14 @@ function ReportsScreen() {
       const v = filtered
         .filter(o => { const t = new Date(o.createdAt).getTime(); return t >= start && t < end; })
         .reduce((s, o) => s + o.total, 0);
-      return { label: range === "Daily" ? `${Math.round((i * 24) / points)}h` : `Day ${i + 1}`, value: v };
+      return { label: range === "Daily" ? `${Math.round((i * 24) / points)}h` : `P${i + 1}`, value: v };
     });
 
     const total = synth ? buckets.reduce((s, b) => s + b.value, 0) : filtered.reduce((s, o) => s + o.total, 0);
     const count = synth ? Math.round(total / 6) : filtered.length;
     const avg = count > 0 ? total / count : 0;
+    const vatTotal = filtered.reduce((s, o) => s + (o.vatAmount || 0), 0);
+    const discountTotal = filtered.reduce((s, o) => s + (o.discountAmount || 0), 0);
 
     const productMap: Record<string, { name: string; qty: number; revenue: number }> = {};
     filtered.forEach(o => o.items.forEach(i => {
@@ -49,17 +54,20 @@ function ReportsScreen() {
     }));
     const top = Object.values(productMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
 
-    return { total, count, avg, buckets, top };
+    return { total, count, avg, buckets, top, vatTotal, discountTotal };
   }, [orders, range]);
 
   const maxV = Math.max(...buckets.map(b => b.value), 1);
 
   const exportCsv = () => {
+    if (!canExport) { alert("Only authorized personnel can export reports."); return; }
     const rows = [
       ["Range", range],
-      ["Total Sales", total.toFixed(2)],
+      ["Total Revenue", total.toFixed(2)],
       ["Orders", String(count)],
       ["Average Ticket", avg.toFixed(2)],
+      ["VAT Collected", vatTotal.toFixed(2)],
+      ["Discounts Granted", discountTotal.toFixed(2)],
       [],
       ["Period", "Sales"],
       ...buckets.map(b => [b.label, b.value.toFixed(2)]),
@@ -75,14 +83,19 @@ function ReportsScreen() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-3xl">Sales Report</h1>
-        <button onClick={exportCsv} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm flex items-center gap-2 hover:opacity-90">
-          <Download className="w-4 h-4" /> Export CSV
+        <div>
+          <h1 className="font-display text-3xl">Sales & Revenue Report</h1>
+          <p className="text-sm text-muted-foreground">All reporting periods</p>
+        </div>
+        <button onClick={exportCsv} disabled={!canExport}
+                title={canExport ? "" : "Authorized personnel only"}
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm flex items-center gap-2 hover:opacity-90 disabled:opacity-40">
+          {canExport ? <Download className="w-4 h-4" /> : <Lock className="w-4 h-4" />} Export CSV
         </button>
       </div>
 
-      <div className="flex gap-2 mb-6">
-        {(["Daily", "Weekly", "Monthly"] as Range[]).map(r => (
+      <div className="flex flex-wrap gap-2 mb-6">
+        {(["Daily", "Weekly", "Monthly", "Quarterly", "Yearly", "All-Time"] as Range[]).map(r => (
           <button key={r} onClick={() => setRange(r)}
                   className={`px-5 py-2 rounded-full text-sm font-medium ${
                     range === r ? "bg-primary text-primary-foreground" : "bg-card border hover:bg-muted"
@@ -90,10 +103,12 @@ function ReportsScreen() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatCard icon={<DollarSign className="w-5 h-5" />} label="Total sales" value={fmt(total)} accent />
+      <div className="grid grid-cols-5 gap-4 mb-6">
+        <StatCard icon={<DollarSign className="w-5 h-5" />} label="Revenue" value={fmt(total)} accent />
         <StatCard icon={<ShoppingBag className="w-5 h-5" />} label="Orders" value={String(count)} />
         <StatCard icon={<TrendingUp className="w-5 h-5" />} label="Avg. ticket" value={fmt(avg)} />
+        <StatCard icon={<DollarSign className="w-5 h-5" />} label="VAT collected" value={fmt(vatTotal)} />
+        <StatCard icon={<DollarSign className="w-5 h-5" />} label="Discounts" value={fmt(discountTotal)} />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -108,7 +123,7 @@ function ReportsScreen() {
                        background: "linear-gradient(to top, var(--espresso), var(--caramel))",
                        minHeight: "4px",
                      }} />
-                <div className="text-[10px] text-muted-foreground rotate-0">{b.label}</div>
+                <div className="text-[10px] text-muted-foreground">{b.label}</div>
               </div>
             ))}
           </div>
@@ -144,7 +159,7 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
       <div className={`flex items-center gap-2 text-xs ${accent ? "opacity-80" : "text-muted-foreground"}`}>
         {icon} {label}
       </div>
-      <div className="font-display text-3xl mt-2">{value}</div>
+      <div className="font-display text-2xl mt-2">{value}</div>
     </div>
   );
 }
