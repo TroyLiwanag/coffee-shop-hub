@@ -14,10 +14,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppPosRouteImport } from './routes/_app.pos'
+import { Route as AppPayrollRouteImport } from './routes/_app.payroll'
 import { Route as AppPaymentRouteImport } from './routes/_app.payment'
 import { Route as AppOrdersRouteImport } from './routes/_app.orders'
 import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppEmployeesRouteImport } from './routes/_app.employees'
+import { Route as AppAuditRouteImport } from './routes/_app.audit'
+import { Route as AppAttendanceRouteImport } from './routes/_app.attendance'
 import { Route as AppReceiptIdRouteImport } from './routes/_app.receipt.$id'
 
 const AppRoute = AppRouteImport.update({
@@ -44,6 +47,11 @@ const AppPosRoute = AppPosRouteImport.update({
   path: '/pos',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPayrollRoute = AppPayrollRouteImport.update({
+  id: '/payroll',
+  path: '/payroll',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPaymentRoute = AppPaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
@@ -64,6 +72,16 @@ const AppEmployeesRoute = AppEmployeesRouteImport.update({
   path: '/employees',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAttendanceRoute = AppAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReceiptIdRoute = AppReceiptIdRouteImport.update({
   id: '/receipt/$id',
   path: '/receipt/$id',
@@ -72,10 +90,13 @@ const AppReceiptIdRoute = AppReceiptIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/attendance': typeof AppAttendanceRoute
+  '/audit': typeof AppAuditRoute
   '/employees': typeof AppEmployeesRoute
   '/inventory': typeof AppInventoryRoute
   '/orders': typeof AppOrdersRoute
   '/payment': typeof AppPaymentRoute
+  '/payroll': typeof AppPayrollRoute
   '/pos': typeof AppPosRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -83,10 +104,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/attendance': typeof AppAttendanceRoute
+  '/audit': typeof AppAuditRoute
   '/employees': typeof AppEmployeesRoute
   '/inventory': typeof AppInventoryRoute
   '/orders': typeof AppOrdersRoute
   '/payment': typeof AppPaymentRoute
+  '/payroll': typeof AppPayrollRoute
   '/pos': typeof AppPosRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -96,10 +120,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/_app/attendance': typeof AppAttendanceRoute
+  '/_app/audit': typeof AppAuditRoute
   '/_app/employees': typeof AppEmployeesRoute
   '/_app/inventory': typeof AppInventoryRoute
   '/_app/orders': typeof AppOrdersRoute
   '/_app/payment': typeof AppPaymentRoute
+  '/_app/payroll': typeof AppPayrollRoute
   '/_app/pos': typeof AppPosRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -109,10 +136,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/attendance'
+    | '/audit'
     | '/employees'
     | '/inventory'
     | '/orders'
     | '/payment'
+    | '/payroll'
     | '/pos'
     | '/reports'
     | '/settings'
@@ -120,10 +150,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/attendance'
+    | '/audit'
     | '/employees'
     | '/inventory'
     | '/orders'
     | '/payment'
+    | '/payroll'
     | '/pos'
     | '/reports'
     | '/settings'
@@ -132,10 +165,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/_app/attendance'
+    | '/_app/audit'
     | '/_app/employees'
     | '/_app/inventory'
     | '/_app/orders'
     | '/_app/payment'
+    | '/_app/payroll'
     | '/_app/pos'
     | '/_app/reports'
     | '/_app/settings'
@@ -184,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/payroll': {
+      id: '/_app/payroll'
+      path: '/payroll'
+      fullPath: '/payroll'
+      preLoaderRoute: typeof AppPayrollRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/payment': {
       id: '/_app/payment'
       path: '/payment'
@@ -212,6 +255,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmployeesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/audit': {
+      id: '/_app/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/attendance': {
+      id: '/_app/attendance'
+      path: '/attendance'
+      fullPath: '/attendance'
+      preLoaderRoute: typeof AppAttendanceRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/receipt/$id': {
       id: '/_app/receipt/$id'
       path: '/receipt/$id'
@@ -223,10 +280,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAttendanceRoute: typeof AppAttendanceRoute
+  AppAuditRoute: typeof AppAuditRoute
   AppEmployeesRoute: typeof AppEmployeesRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppOrdersRoute: typeof AppOrdersRoute
   AppPaymentRoute: typeof AppPaymentRoute
+  AppPayrollRoute: typeof AppPayrollRoute
   AppPosRoute: typeof AppPosRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -234,10 +294,13 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAttendanceRoute: AppAttendanceRoute,
+  AppAuditRoute: AppAuditRoute,
   AppEmployeesRoute: AppEmployeesRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppOrdersRoute: AppOrdersRoute,
   AppPaymentRoute: AppPaymentRoute,
+  AppPayrollRoute: AppPayrollRoute,
   AppPosRoute: AppPosRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,

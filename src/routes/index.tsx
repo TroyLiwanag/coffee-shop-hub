@@ -15,14 +15,14 @@ function LoginScreen() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    if (user) navigate({ to: user.role === "admin" ? "/pos" : "/pos" });
+    if (user) navigate({ to: user.role === "staff" ? "/attendance" : "/pos" });
   }, [user, navigate]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
     if (!login(name.trim(), password.trim())) {
-      setErr("Invalid username or password. Try staff / staff123, admin / admin123, or superadmin / superadmin123.");
+      setErr("Invalid username or password. Try staff / staff123, cashier / cashier123, or admin / admin123.");
     }
   };
 
@@ -58,8 +58,11 @@ function LoginScreen() {
                   className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition">
             Log in
           </button>
-          <div className="text-xs text-center text-muted-foreground pt-2 border-t">
-            Demo · <span className="font-medium">staff / staff123</span> (cashier) · <span className="font-medium">admin / admin123</span> (admin) · <span className="font-medium">superadmin / superadmin123</span> (admin)
+          <div className="text-xs text-center text-muted-foreground pt-2 border-t space-y-1">
+            <div>Demo accounts:</div>
+            <div><span className="font-medium">staff / staff123</span> — attendance only</div>
+            <div><span className="font-medium">cashier / cashier123</span> — POS</div>
+            <div><span className="font-medium">admin / admin123</span> — full access</div>
           </div>
         </form>
       </div>
