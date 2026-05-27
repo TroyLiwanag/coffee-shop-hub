@@ -206,6 +206,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 interface Ctx {
+  hydrated: boolean;
   user: User | null;
   login: (name: string, password: string) => boolean;
   logout: () => void;
