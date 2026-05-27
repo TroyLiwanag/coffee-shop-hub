@@ -19,9 +19,9 @@ export function AppShell() {
   if (!user) return null;
 
   const navAll: { to: string; label: string; icon: typeof Home; roles: Role[] }[] = [
-    { to: "/pos", label: "POS", icon: Home, roles: ["cashier", "admin"] },
-    { to: "/orders", label: "Orders", icon: Receipt, roles: ["cashier", "admin"] },
-    { to: "/attendance", label: "Attendance", icon: Clock, roles: ["staff", "cashier", "admin"] },
+    { to: "/pos", label: "POS", icon: Home, roles: ["staff", "admin"] },
+    { to: "/orders", label: "Orders", icon: Receipt, roles: ["staff", "admin"] },
+    { to: "/attendance", label: "Attendance", icon: Clock, roles: ["staff", "admin"] },
     { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin"] },
     { to: "/reports", label: "Reports", icon: BarChart3, roles: ["admin"] },
     { to: "/payroll", label: "Payroll", icon: Wallet, roles: ["admin"] },

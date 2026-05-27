@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type Role = "staff" | "cashier" | "admin";
+export type Role = "staff" | "admin";
 export interface User {
   id: string;
   name: string;
@@ -149,10 +149,9 @@ export const PRODUCTS: Product[] = [
   { id: "r5", name: "Nuggets-silog (Nuggets 5pcs, Rice, Egg)", price: 120, category: "Rice Meals", emoji: "🍗", unit: "plate", batchNo: "B-R005" },
 ];
 
-// 3 demo users only: staff, cashier, admin
+// 2 demo users: staff (operations), admin (full access)
 export const USERS: User[] = [
   { id: "u1", name: "staff", password: "staff123", role: "staff", hourlyRate: 80, canExport: false },
-  { id: "u2", name: "cashier", password: "cashier123", role: "cashier", hourlyRate: 95, canExport: false },
   { id: "u3", name: "admin", password: "admin123", role: "admin", hourlyRate: 180, canExport: true },
 ];
 
@@ -278,10 +277,12 @@ export function PosProvider({ children }: { children: ReactNode }) {
     setIngredients(load("pos.ingredients", INITIAL_INGREDIENTS));
     setOrders(load("pos.orders", []));
     setSettings({ ...DEFAULT_SETTINGS, ...load("pos.settings", DEFAULT_SETTINGS) });
-    // migrate: force only 3 demo users if old superadmin still around
+    // migrate: only staff & admin roles; convert legacy cashier→staff, drop superadmin
     const stored = load<User[]>("pos.employees", USERS);
-    const cleaned = stored.filter(e => e.name !== "superadmin");
-    setEmployees(cleaned.length >= 3 ? cleaned : USERS);
+    const migrated = stored
+      .filter(e => e.name !== "superadmin")
+      .map(e => (e.role as string) === "cashier" ? { ...e, role: "staff" as Role } : e);
+    setEmployees(migrated.length >= 2 ? migrated : USERS);
     setAttendance(load("pos.attendance", []));
     setAudit(load("pos.audit", []));
     setHydrated(true);
