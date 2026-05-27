@@ -9,11 +9,12 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginScreen() {
-  const { user, login } = usePos();
+  const { user, login, hydrated } = usePos();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/pos" });
@@ -22,10 +23,17 @@ function LoginScreen() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!login(name.trim(), password.trim())) {
-      setErr("Invalid username or password. Try staff / staff123 or admin / admin123.");
-    }
+    setLoading(true);
+    // small delay so the brewing animation is visible
+    setTimeout(() => {
+      if (!login(name.trim(), password.trim())) {
+        setErr("Invalid username or password. Try staff / staff123 or admin / admin123.");
+        setLoading(false);
+      }
+    }, 600);
   };
+
+  if (!hydrated) return <FullScreenLoader label="Warming the espresso machine" />;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6"
