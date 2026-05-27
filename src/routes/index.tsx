@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { usePos } from "@/lib/pos-store";
+import { DotsLoader, FullScreenLoader } from "@/components/Loader";
 import logo from "@/assets/cafe-corazon-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -8,11 +9,12 @@ export const Route = createFileRoute("/")({
 });
 
 function LoginScreen() {
-  const { user, login } = usePos();
+  const { user, login, hydrated } = usePos();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/pos" });
@@ -21,10 +23,17 @@ function LoginScreen() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!login(name.trim(), password.trim())) {
-      setErr("Invalid username or password. Try staff / staff123 or admin / admin123.");
-    }
+    setLoading(true);
+    // small delay so the brewing animation is visible
+    setTimeout(() => {
+      if (!login(name.trim(), password.trim())) {
+        setErr("Invalid username or password. Try staff / staff123 or admin / admin123.");
+        setLoading(false);
+      }
+    }, 600);
   };
+
+  if (!hydrated) return <FullScreenLoader label="Warming the espresso machine" />;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6"
@@ -50,13 +59,13 @@ function LoginScreen() {
                    className="mt-2 w-full px-4 py-3 rounded-lg border border-input bg-background tracking-widest focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
           {err && (
-            <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-lg px-3 py-2">
+            <div className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-lg px-3 py-2 animate-fade-up">
               {err}
             </div>
           )}
-          <button type="submit"
-                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition">
-            Log in
+          <button type="submit" disabled={loading}
+                  className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-80">
+            {loading ? <>Brewing <DotsLoader className="text-primary-foreground" /></> : "Log in"}
           </button>
           <div className="text-xs text-center text-muted-foreground pt-2 border-t space-y-1">
             <div>Demo accounts:</div>

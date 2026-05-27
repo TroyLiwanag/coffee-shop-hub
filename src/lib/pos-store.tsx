@@ -206,6 +206,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 interface Ctx {
+  hydrated: boolean;
   user: User | null;
   login: (name: string, password: string) => boolean;
   logout: () => void;
@@ -416,6 +417,7 @@ export function PosProvider({ children }: { children: ReactNode }) {
 
   return (
     <PosContext.Provider value={{
+      hydrated,
       user, login, logout,
       cart, addToCart, removeFromCart, updateQty, clearCart,
       discount, setDiscount,
