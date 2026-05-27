@@ -15,14 +15,14 @@ function LoginScreen() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    if (user) navigate({ to: user.role === "staff" ? "/attendance" : "/pos" });
+    if (user) navigate({ to: "/pos" });
   }, [user, navigate]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
     if (!login(name.trim(), password.trim())) {
-      setErr("Invalid username or password. Try staff / staff123, cashier / cashier123, or admin / admin123.");
+      setErr("Invalid username or password. Try staff / staff123 or admin / admin123.");
     }
   };
 
