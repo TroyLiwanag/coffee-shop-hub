@@ -277,10 +277,12 @@ export function PosProvider({ children }: { children: ReactNode }) {
     setIngredients(load("pos.ingredients", INITIAL_INGREDIENTS));
     setOrders(load("pos.orders", []));
     setSettings({ ...DEFAULT_SETTINGS, ...load("pos.settings", DEFAULT_SETTINGS) });
-    // migrate: force only 3 demo users if old superadmin still around
+    // migrate: only staff & admin roles; convert legacy cashier→staff, drop superadmin
     const stored = load<User[]>("pos.employees", USERS);
-    const cleaned = stored.filter(e => e.name !== "superadmin");
-    setEmployees(cleaned.length >= 3 ? cleaned : USERS);
+    const migrated = stored
+      .filter(e => e.name !== "superadmin")
+      .map(e => (e.role as string) === "cashier" ? { ...e, role: "staff" as Role } : e);
+    setEmployees(migrated.length >= 2 ? migrated : USERS);
     setAttendance(load("pos.attendance", []));
     setAudit(load("pos.audit", []));
     setHydrated(true);
