@@ -149,10 +149,9 @@ export const PRODUCTS: Product[] = [
   { id: "r5", name: "Nuggets-silog (Nuggets 5pcs, Rice, Egg)", price: 120, category: "Rice Meals", emoji: "🍗", unit: "plate", batchNo: "B-R005" },
 ];
 
-// 3 demo users only: staff, cashier, admin
+// 2 demo users: staff (operations), admin (full access)
 export const USERS: User[] = [
   { id: "u1", name: "staff", password: "staff123", role: "staff", hourlyRate: 80, canExport: false },
-  { id: "u2", name: "cashier", password: "cashier123", role: "cashier", hourlyRate: 95, canExport: false },
   { id: "u3", name: "admin", password: "admin123", role: "admin", hourlyRate: 180, canExport: true },
 ];
 
