@@ -5,17 +5,19 @@ import {
   Wallet, Clock, FileSearch, ArrowLeft,
 } from "lucide-react";
 import { useEffect } from "react";
+import { FullScreenLoader } from "@/components/Loader";
 
 export function AppShell() {
-  const { user, logout, settings } = usePos();
+  const { user, logout, settings, hydrated } = usePos();
   const navigate = useNavigate();
   const router = useRouter();
   const pathname = useRouterState({ select: s => s.location.pathname });
 
   useEffect(() => {
-    if (user === null) navigate({ to: "/" });
-  }, [user, navigate]);
+    if (hydrated && user === null) navigate({ to: "/" });
+  }, [user, navigate, hydrated]);
 
+  if (!hydrated) return <FullScreenLoader label="Warming the espresso machine" />;
   if (!user) return null;
 
   const navAll: { to: string; label: string; icon: typeof Home; roles: Role[] }[] = [
