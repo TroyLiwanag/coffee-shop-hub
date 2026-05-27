@@ -60,8 +60,7 @@ function LoginScreen() {
           </button>
           <div className="text-xs text-center text-muted-foreground pt-2 border-t space-y-1">
             <div>Demo accounts:</div>
-            <div><span className="font-medium">staff / staff123</span> — attendance only</div>
-            <div><span className="font-medium">cashier / cashier123</span> — POS</div>
+            <div><span className="font-medium">staff / staff123</span> — POS, orders, attendance</div>
             <div><span className="font-medium">admin / admin123</span> — full access</div>
           </div>
         </form>
